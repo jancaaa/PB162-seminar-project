@@ -1,7 +1,5 @@
 package cz.muni.fi.pb162.project.test;
 
-import cz.muni.fi.pb162.project.test.BasicRulesTester;
-import cz.muni.fi.pb162.project.test.OutputTester;
 import cz.muni.fi.pb162.project.demo.Demo;
 import org.junit.Test;
 import static org.junit.Assert.*;
