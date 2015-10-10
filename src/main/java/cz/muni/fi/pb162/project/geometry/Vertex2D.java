@@ -6,6 +6,11 @@ package cz.muni.fi.pb162.project.geometry;
  * @version: 7.10.2015
  *
  */
+
+/**
+ * Represents vertex [X,Y]
+ */
+
 public class Vertex2D {
     private double X;
     private double Y;
