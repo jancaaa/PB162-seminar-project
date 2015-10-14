@@ -21,18 +21,6 @@ public class Triangle {
     private Triangle t2=null;
     private Triangle t3=null;
 
-    public void setVertexA(Vertex2D vert) {
-        vertexA = vert;
-    }
-
-    public void setVertexB(Vertex2D vert) {
-        vertexB = vert;
-    }
-
-    public void setVertexC(Vertex2D vert) {
-        vertexC = vert;
-    }
-
     public Vertex2D getVertexA() {
         return vertexA;
     }
@@ -45,9 +33,18 @@ public class Triangle {
         return vertexA;
     }
 
+    public Triangle(Vertex2D vertexA, Vertex2D vertexB, Vertex2D vertexC) {
+        this.vertexA = vertexA;
+        this.vertexB = vertexB;
+        this.vertexC = vertexC;
+    }
+
     @Override
     public String toString() {
-        return "Triangle: vertices=" + vertexA.toString()+ " " + vertexB.toString() +" "+ vertexC.toString();
+        if (vertexA==null || vertexB == null || vertexC == null)
+            return "INVALID TRIANGLE";
+        else
+            return "Triangle: vertices=" + vertexA.toString()+ " " + vertexB.toString() +" "+ vertexC.toString();
     }
 
     /**
@@ -56,14 +53,6 @@ public class Triangle {
      */
     public boolean isDivided(){
         return (t1!=null && t2!=null && t3!=null);
-        /*
-        if (T1==null && T2==null && T3==null){
-            return false;
-        }
-        else{
-            return true;
-        }
-        */
     }
 
     /**
@@ -97,35 +86,28 @@ public class Triangle {
             return false;
 
         //middles of edges
-        Vertex2D sa = new Vertex2D();
-        sa.setX((vertexB.getX() + vertexC.getX())/2);
-        sa.setY((vertexB.getY() + vertexC.getY())/2);
+        Vertex2D sa = new Vertex2D((vertexB.getX() + vertexC.getX())/2,(vertexB.getY() + vertexC.getY())/2);
+        Vertex2D sb = new Vertex2D((vertexA.getX() + vertexC.getX())/2,(vertexA.getY() + vertexC.getY())/2);
+        Vertex2D sc = new Vertex2D((vertexA.getX() + vertexB.getX())/2, (vertexA.getY() + vertexC.getY())/2);
 
-        Vertex2D sb = new Vertex2D();
-        sb.setX((vertexA.getX() + vertexC.getX())/2);
-        sb.setY((vertexA.getY() + vertexC.getY())/2);
-
-        Vertex2D sc = new Vertex2D();
-        sc.setX((vertexA.getX() + vertexB.getX())/2);
-        sc.setY((vertexA.getY() + vertexC.getY())/2);
-
-        t1 = new Triangle();
-        t2 = new Triangle();
-        t3 = new Triangle();
-
-        t1.setVertexA(vertexA);
-        t1.setVertexB(sc);
-        t1.setVertexC(sb);
-
-        t2.setVertexA(sc);
-        t2.setVertexB(vertexB);
-        t2.setVertexC(sa);
-
-        t3.setVertexA(sb);
-        t3.setVertexB(sa);
-        t3.setVertexC(vertexC);
+        t1 = new Triangle(this.vertexA,sc,sb);
+        t2 = new Triangle(sc,this.vertexB,sa);
+        t3 = new Triangle(sb,sa,vertexC);
 
         return true;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isEquilateral(){
+        double a = this.vertexB.distance(this.vertexC);
+        double b = this.vertexA.distance(this.vertexC);
+        double c = this.vertexA.distance(this.vertexB);
+
+
+            return Math.abs(a-b)<0.001 && Math.abs(b-c)<0.001 && Math.abs(a-c)<0.001;
     }
 
 }

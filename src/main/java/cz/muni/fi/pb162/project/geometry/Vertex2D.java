@@ -19,16 +19,26 @@ public class Vertex2D {
         return x;
     }
 
-    public void setX(double newx) {
-        this.x = newx;
-    }
-
     public double getY() {
         return y;
     }
 
-    public void setY(double newy) {
-        this.y = newy;
+    public Vertex2D(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     *
+     * @param vert
+     * @return
+     */
+    public double distance (Vertex2D vert){
+        if (vert == null)
+            return -1.0;
+        else
+
+            return Math.sqrt(Math.pow(vert.getX()-this.getX(),2)+Math.pow((vert.getY()-this.getY()),2));
     }
 
     @Override
