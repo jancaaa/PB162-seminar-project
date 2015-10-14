@@ -11,46 +11,27 @@ import java.io.PrintStream;
 public class OutputTester {
 
     private OutputStream os;
-    private PrintStream tempOutput;
-    private PrintStream origOutput;
-
-    /**
-     * Constructor
-     */
+    private PrintStream  tempOutput;
+    private PrintStream  origOutput;
+    
     public OutputTester() {
         os = new ByteArrayOutputStream();
         tempOutput = new PrintStream(os);
     }
-
-    /**
-     * Capture stdout and temporarily replace it with controlled output stream
-     */
+    
     public void captureOutput() {
         origOutput = System.out;
         System.setOut(tempOutput);
     }
-
-    /**
-     * Release the captured stdout
-     */
+    
     public void releaseOutput() {
         System.setOut(origOutput);
     }
 
-    /**
-     * Check that a matching text was written to stdout
-     * @param exp expected output
-     * @return true if expected text is on stdout, false otherwise
-     */
     public boolean outputEquals(String exp) {
         return exp.trim().equals(os.toString().trim());
     }
-
-    /**
-     * Check that a matching text (ignoring case) was written to stdout
-     * @param exp expected output
-     * @return true if expected text is on stdout, false otherwise
-     */
+    
     public boolean outputEqualsIgnoreCase(String exp) {
         return exp.trim().equalsIgnoreCase(os.toString().trim());
     }

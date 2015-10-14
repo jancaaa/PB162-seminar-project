@@ -6,25 +6,11 @@
 <module name="Checker">
   <!--<property name="fileExtensions" value="java, xml, properties"/>-->
 
-  <!-- Checks whether files end with a new line.                        -->
-  <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
-  <module name="NewlineAtEndOfFile"/>
-
   <!-- Checks for whitespace                               -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html -->
   <module name="FileTabCharacter"/>
 
-  <!-- Miscellaneous other checks.                   -->
-  <!-- See http://checkstyle.sf.net/config_misc.html -->
-  <module name="RegexpSingleline">
-    <property name="format" value="\s+$"/>
-    <property name="minimum" value="0"/>
-    <property name="maximum" value="0"/>
-    <property name="message" value="Line has trailing spaces."/>
-  </module>
-
   <module name="TreeWalker">
-
     <!-- Checks for Javadoc comments.                     -->
     <!-- See http://checkstyle.sf.net/config_javadoc.html -->
     <module name="JavadocMethod">
@@ -65,19 +51,7 @@
     </module>
     <module name="MethodLength"/>
     <module name="ParameterNumber"/>
-
-    <!-- Checks for whitespace                               -->
-    <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-    <module name="EmptyForIteratorPad"/>
-    <module name="GenericWhitespace"/>
-    <module name="MethodParamPad"/>
-    <module name="NoWhitespaceAfter"/>
-    <module name="NoWhitespaceBefore"/>
-    <module name="ParenPad"/>
-    <module name="TypecastParenPad"/>
-    <module name="WhitespaceAfter"/>
-    <module name="WhitespaceAround"/>
-
+    
     <!-- Modifier Checks                                    -->
     <!-- See http://checkstyle.sf.net/config_modifier.html -->
     <module name="ModifierOrder"/>
@@ -96,7 +70,6 @@
     <!-- See http://checkstyle.sf.net/config_coding.html -->
     <module name="EmptyStatement"/>
     <module name="EqualsHashCode"/>
-    <module name="MagicNumber"/>
     <module name="MissingSwitchDefault"/>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>

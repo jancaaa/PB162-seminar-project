@@ -49,10 +49,11 @@
             <configuration>
               <configLocation>pb162_codestyle.xml</configLocation>
               <encoding>UTF-8</encoding>
-              <consoleOutput>false</consoleOutput>
-              <failOnViolation>true</failOnViolation>
+              <consoleOutput>true</consoleOutput>
+              <failOnViolation>false</failOnViolation>
               <violationSeverity>warning</violationSeverity>
               <includeTestSourceDirectory>false</includeTestSourceDirectory>
+              <excludes>*/**/Draw*</excludes>
             </configuration>
             <goals>
               <goal>check</goal>
