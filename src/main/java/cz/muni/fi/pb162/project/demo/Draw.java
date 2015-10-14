@@ -3,14 +3,13 @@ package cz.muni.fi.pb162.project.demo;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import java.util.List;
-import java.util.ArrayList;
-
+import cz.muni.fi.pb162.project.geometry.Circle;
 import cz.muni.fi.pb162.project.geometry.Triangle;
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
-//import lesson01.geometry.Circle;
 
 /**
  * 
@@ -30,11 +29,13 @@ public class Draw extends JFrame {
 
     protected JPanel panel;
     
-    private List<Vertex2D> vertices = new ArrayList<Vertex2D>();
+    private List<Vertex2D> vertices  = new ArrayList<Vertex2D>();
     private List<Triangle> triangles = new ArrayList<Triangle>();
+    private List<Circle>   circles   = new ArrayList<Circle>();
     
     private Color vertexColor;
     private Color triangleColor;
+    private Color circleColor;
     
     /**
      * Defaultni konstruktor nastavi defaultni barvy pro telesa. Pozadi bile, body cervene, kruznice modre, trojuhelniky zelene
@@ -44,6 +45,7 @@ public class Draw extends JFrame {
         panel.setBackground(Color.WHITE);
         this.vertexColor = Color.RED;
         this.triangleColor = Color.BLUE;
+        this.circleColor = Color.ORANGE;
     }
     
     private void initialize() {
@@ -92,6 +94,30 @@ public class Draw extends JFrame {
     }
 
     /**
+     * Metoda pro pridani kruznice do seznamu pro vykresleni.
+     * Metoda vraci logickou hodnotu v zavislosti na tom zda-li neni kruznice mimo vykreslovaci prostor.
+     * 
+     * @param circle Kruznice kterou chci vykreslit
+     * @return true pokud se kruznice vykresli, false nikoliv
+     */
+    public boolean paintCircle(Circle circle) {
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+        int halfX = width/2;
+        int halfY = height/2;
+        
+        int x = width - ((int) Math.rint(halfX - circle.getCenter().getX()));
+        int y = (int) Math.rint(halfY - circle.getCenter().getY());
+        int r = (int) circle.getRadius();
+        
+        if (x-r < 0 || x+r > width || y-r < 0 || y+r > height) {
+            return false;
+        }
+        circles.add(circle);
+        return true;
+    }
+    
+    /**
      * Metoda pro pridani trojuhelnika do seznamu pro vykresleni.
      * Metoda vraci logickou hodnotu v zavislosti na tom zda-li neni trojuhelnik mimo vykreslovaci prostor.
      * 
@@ -133,6 +159,22 @@ public class Draw extends JFrame {
         g.drawLine(x-VERT_LENGTH, y-VERT_LENGTH, x+VERT_LENGTH, y+VERT_LENGTH);
     }
  
+    protected void paintCircle(Graphics g, Circle c) {
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+        int halfX = width/2;
+        int halfY = height/2;
+        
+        int r = (int) Math.rint(c.getRadius());
+        int x = width - ((int) Math.rint(halfX - c.getCenter().getX()) + r);
+        int y = (int) Math.rint(halfY - c.getCenter().getY()) - r;
+        int w = (int) Math.rint(c.getRadius() * 2.0);
+        int h = (int) Math.rint(c.getRadius() * 2.0);
+        g.setColor(circleColor);
+        g.drawOval(x, y, w, h);
+
+    }
+    
     protected void paintTriangle(Graphics g, Triangle tri) {
         int width = panel.getWidth();
         int height = panel.getHeight();
@@ -173,27 +215,24 @@ public class Draw extends JFrame {
         for (Triangle t : triangles) {
             paintTriangle(g, t);
         }
+        for (Circle c : circles) {
+            paintCircle(g, c);
+        }
     }
     
     public static void main(String[] args) {
-        Vertex2D v1 = new Vertex2D();
-        Vertex2D v2 = new Vertex2D();
-        Vertex2D v3 = new Vertex2D();
-        v1.setX(-100);
-        v1.setY( 0);
-        v2.setX( 0);
-        v2.setY( 100);
-        v3.setX( 100);
-        v3.setY(-100);
+        Vertex2D v1 = new Vertex2D(-100,-100);
+        Vertex2D v2 = new Vertex2D(0,100);
+        Vertex2D v3 = new Vertex2D(100,-100);
         
-        Triangle tri = new Triangle();
-        tri.setVertexA(v1);
-        tri.setVertexB(v2);
-        tri.setVertexC(v3);
+        Triangle tri = new Triangle(v1, v2, v3);
+        Circle   cir = new Circle(new Vertex2D(0,0), 100);
         
         Draw canvas = new Draw();
         canvas.paintTriangle(tri);
+        canvas.paintCircle(cir);
         canvas.startPainting();
+
     }
 }
 
