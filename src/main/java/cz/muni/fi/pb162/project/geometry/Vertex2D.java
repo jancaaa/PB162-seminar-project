@@ -12,27 +12,27 @@ package cz.muni.fi.pb162.project.geometry;
  */
 
 public class Vertex2D {
-    private double X;
-    private double Y;
+    private double x;
+    private double y;
 
     public double getX() {
-        return X;
+        return x;
     }
 
-    public void setX(double newX) {
-        X = newX;
+    public void setX(double newx) {
+        this.x = newx;
     }
 
     public double getY() {
-        return Y;
+        return y;
     }
 
-    public void setY(double newY) {
-        Y = newY;
+    public void setY(double newy) {
+        this.y = newy;
     }
 
     @Override
     public String toString() {
-        return "["+ X + ", " + Y + "]";
+        return "["+ x + ", " + y + "]";
     }
 }
