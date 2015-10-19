@@ -11,7 +11,10 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <version.plugin.checkstyle>2.16</version.plugin.checkstyle>
+    <version.plugin.source>2.4</version.plugin.source>
     <version.junit>4.12</version.junit>
+    <checkstyle.fail>false</checkstyle.fail>
   </properties>
 
   <dependencies>
@@ -28,6 +31,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>${version.plugin.source}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -41,7 +45,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.16</version>
+        <version>${version.plugin.checkstyle}</version>
         <executions>
           <execution>
             <id>validate</id>
@@ -50,7 +54,7 @@
               <configLocation>pb162_codestyle.xml</configLocation>
               <encoding>UTF-8</encoding>
               <consoleOutput>true</consoleOutput>
-              <failOnViolation>false</failOnViolation>
+              <failOnViolation>${checkstyle.fail}</failOnViolation>
               <violationSeverity>warning</violationSeverity>
               <includeTestSourceDirectory>false</includeTestSourceDirectory>
               <excludes>*/**/Draw*</excludes>
