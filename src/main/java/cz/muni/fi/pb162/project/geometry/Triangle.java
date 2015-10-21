@@ -10,7 +10,8 @@
     /**
      * Represents triangle ABC.
      */
-    public class Triangle {
+    public class Triangle implements Solid{
+
         //vertices
         private Vertex2D vertexA;
         private Vertex2D vertexB;
@@ -20,6 +21,8 @@
         private Triangle t1=null;
         private Triangle t2=null;
         private Triangle t3=null;
+
+        public static final double EPS = 0.001;
 
         public Vertex2D getVertexA() {
             return vertexA;
@@ -116,6 +119,47 @@
             double a = this.vertexB.distance(this.vertexC);
             double b = this.vertexA.distance(this.vertexC);
             double c = this.vertexA.distance(this.vertexB);
-            return (Math.abs(a-b)<0.001 && Math.abs(b-c)<0.001 && Math.abs(a-c)<0.001);
+            return (Math.abs(a-b)<EPS && Math.abs(b-c)<EPS && Math.abs(a-c)<EPS);
+        }
+
+        @Override
+        public double getArea() {
+            double a = this.vertexB.distance(this.vertexC);
+            double b = this.vertexA.distance(this.vertexC);
+            double c = this.vertexA.distance(this.vertexB);
+            double s = (a+b+c)/2;
+            return Math.sqrt(s *(s-a)*(s-b)*(s-c));
+        }
+
+        @Override
+        public double getWidth() {
+            double pom1 = vertexA.getX();
+            double pom2 = vertexB.getX();
+            double pom3 = vertexC.getX();
+            double maxX;
+            double minX;
+            maxX=Math.max(Math.max(pom1,pom2),pom3);
+            minX=Math.min(Math.min(pom1, pom2),pom3);
+            return maxX-minX;
+        }
+
+        @Override
+        public double getHeight() {
+            double pom1 = vertexA.getY();
+            double pom2 = vertexB.getY();
+            double pom3 = vertexC.getY();
+            double maxY;
+            double minY;
+            maxY=Math.max(Math.max(pom1,pom2),pom3);
+            minY=Math.min(Math.min(pom1,pom2),pom3);
+            return maxY-minY;
+        }
+
+        @Override
+        public double getLength() { //obvod
+            double a = this.vertexB.distance(this.vertexC);
+            double b = this.vertexA.distance(this.vertexC);
+            double c = this.vertexA.distance(this.vertexB);
+            return a+b+c;
         }
     }

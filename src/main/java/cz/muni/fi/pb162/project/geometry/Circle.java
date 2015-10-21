@@ -10,7 +10,8 @@
     /**
      * Represents circle (S,r).
      */
-    public class Circle {
+    public class Circle implements Solid{
+
         private Vertex2D center;
         private double radius;
 
@@ -34,5 +35,25 @@
         @Override
         public String toString() {
             return "Circle: center=[" + center.getX() + ", " + center.getY() +  "], radius=" + getRadius();
+        }
+
+        @Override
+        public double getArea() {
+            return Math.PI*getRadius()*getRadius();
+        }
+
+        @Override
+        public double getWidth() {
+            return 2*getRadius();
+        }
+
+        @Override
+        public double getHeight() {
+            return 2*getRadius();
+        }
+
+        @Override
+        public double getLength() { //obvod
+            return 2*Math.PI*getRadius();
         }
     }
