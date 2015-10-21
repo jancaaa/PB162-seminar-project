@@ -1,7 +1,7 @@
 package cz.muni.fi.pb162.project.demo;
 
 import cz.muni.fi.pb162.project.demo.Draw;
-//import cz.muni.fi.pb162.project.geometry.Snowman;
+import cz.muni.fi.pb162.project.geometry.Snowman;
 
 /**
  * 
@@ -14,7 +14,7 @@ import cz.muni.fi.pb162.project.demo.Draw;
 
 public class DrawExtra03 extends Draw {
 
-/*
+
     public static void main(String[] args) {
         Snowman snowman = new Snowman(50, 0.8);
         Draw canvas = new DrawExtra03();
@@ -25,5 +25,4 @@ public class DrawExtra03 extends Draw {
         canvas.paintCircle(snowman.getRightHandBall());
         canvas.startPainting();
     }
-*/
 }
