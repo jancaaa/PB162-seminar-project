@@ -9,11 +9,11 @@ package cz.muni.fi.pb162.project.geometry;
  * Represents snowman.
  */
 public class Snowman {
-    Circle bottomBall;
-    Circle middleBall;
-    Circle topBall;
-    Circle leftHandBall;
-    Circle rightHandBall;
+    private Circle bottomBall;
+    private Circle middleBall;
+    private Circle topBall;
+    private Circle leftHandBall;
+    private Circle rightHandBall;
 
 
     public Snowman(double radius, double reductionFactor) {
