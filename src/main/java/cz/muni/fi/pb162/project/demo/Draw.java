@@ -7,9 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import cz.muni.fi.pb162.project.geometry.Circle;
-import cz.muni.fi.pb162.project.geometry.Triangle;
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
+import cz.muni.fi.pb162.project.geometry.Solid;
+import cz.muni.fi.pb162.project.geometry.Triangle;
+import cz.muni.fi.pb162.project.geometry.Circle;
+import cz.muni.fi.pb162.project.geometry.Colored;
+import cz.muni.fi.pb162.project.geometry.RegularOctagon;
+import cz.muni.fi.pb162.project.geometry.RegularPolygon;
 
 /**
  * 
@@ -29,13 +33,15 @@ public class Draw extends JFrame {
 
     protected JPanel panel;
     
-    private List<Vertex2D> vertices  = new ArrayList<Vertex2D>();
-    private List<Triangle> triangles = new ArrayList<Triangle>();
-    private List<Circle>   circles   = new ArrayList<Circle>();
+    private List<Vertex2D> vertices    = new ArrayList<Vertex2D>();
+    private List<Triangle> triangles   = new ArrayList<Triangle>();
+    private List<Circle>   circles     = new ArrayList<Circle>();
+    private List<RegularPolygon> ngons = new ArrayList<RegularPolygon>();
     
     private Color vertexColor;
     private Color triangleColor;
     private Color circleColor;
+    private Color ngonColor;
     
     /**
      * Defaultni konstruktor nastavi defaultni barvy pro telesa. Pozadi bile, body cervene, kruznice modre, trojuhelniky zelene
@@ -46,6 +52,7 @@ public class Draw extends JFrame {
         this.vertexColor = Color.RED;
         this.triangleColor = Color.BLUE;
         this.circleColor = Color.ORANGE;
+        this.ngonColor = Color.BLACK;
     }
     
     private void initialize() {
@@ -146,6 +153,31 @@ public class Draw extends JFrame {
         return true;
     }
     
+    /**
+     * Metoda pro pridani polygonu do seznamu pro vykresleni.
+     * Metoda vraci logickou hodnotu v zavislosti na tom zda-li neni polygon mimo vykreslovaci prostor.
+     * 
+     * @param polygon Polygon ktery chci vykreslit
+     * @param fill Jestli ma byt polygon vyplneny ci nikoliv
+     * @return true pokud se polygon vykresli, false nikoliv
+     */
+    public boolean paintRegularPolygon(RegularPolygon polygon) {
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+        int halfX = width/2;
+        int halfY = height/2;
+        
+        int x = width - ((int) Math.rint(halfX - polygon.getCenter().getX()));
+        int y = (int) Math.rint(halfY - polygon.getCenter().getY());
+        int r = (int) polygon.getRadius();
+        
+        if (x-r < 0 || x+r > width || y-r < 0 || y+r > height) {
+            return false;
+        }
+        ngons.add(polygon);
+        return true;
+    }
+    
     protected void paintVertex(Graphics g, Vertex2D v) {
         int width = panel.getWidth();
         int height = panel.getHeight();
@@ -170,7 +202,7 @@ public class Draw extends JFrame {
         int y = (int) Math.rint(halfY - c.getCenter().getY()) - r;
         int w = (int) Math.rint(c.getRadius() * 2.0);
         int h = (int) Math.rint(c.getRadius() * 2.0);
-        g.setColor(circleColor);
+        setColor(g, c, circleColor);
         g.drawOval(x, y, w, h);
 
     }
@@ -188,12 +220,52 @@ public class Draw extends JFrame {
         int c1 = width - ((int) Math.rint(halfX - tri.getVertexC().getX()));
         int c2 = (int) Math.rint(halfY - tri.getVertexC().getY());
 
-        g.setColor(triangleColor);
+        setColor(g, tri, triangleColor);
         Polygon triangle = new Polygon();
         triangle.addPoint(a1, a2);
         triangle.addPoint(b1, b2);
         triangle.addPoint(c1, c2);
         g.drawPolygon(triangle);
+    }
+    
+    protected void paintRegularPolygon(Graphics g, RegularPolygon polygon) {
+        if (polygon instanceof Circle) {
+            paintCircle(g, (Circle) polygon);
+            return;
+        }
+        
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+        int halfX = width/2;
+        int halfY = height/2;
+
+        setColor(g, polygon, ngonColor);
+        int[] yVertex = new int[polygon.getNumEdges()];
+        int[] xVertex = new int[polygon.getNumEdges()];
+        
+        for (int i = 0; i < polygon.getNumEdges(); i++) {
+            xVertex[i] = (int) ((halfX + polygon.getCenter().getX()) - polygon.getRadius() * Math.cos(i * 2 * Math.PI / polygon.getNumEdges()));
+            yVertex[i] = (int) ((halfY - polygon.getCenter().getY()) - polygon.getRadius() * Math.sin(i * 2 * Math.PI / polygon.getNumEdges()));
+        }
+        
+        g.drawPolygon(xVertex, yVertex, polygon.getNumEdges());
+    }
+    
+    protected void setColor(Graphics g, Solid obj, Color defaultColor) {
+        g.setColor(defaultColor);
+        
+        if (! (obj instanceof Colored)) return;
+
+        String color = ((Colored)obj).getColor();
+        if (color.equalsIgnoreCase("white")) g.setColor(Color.WHITE);
+        if (color.equalsIgnoreCase("black")) g.setColor(Color.BLACK);
+        if (color.equalsIgnoreCase("blue")) g.setColor(Color.BLUE);
+        if (color.equalsIgnoreCase("cyan")) g.setColor(Color.CYAN);
+        if (color.equalsIgnoreCase("gray")) g.setColor(Color.GRAY);
+        if (color.equalsIgnoreCase("green")) g.setColor(Color.GREEN);
+        if (color.equalsIgnoreCase("orange")) g.setColor(Color.ORANGE);
+        if (color.equalsIgnoreCase("red")) g.setColor(Color.RED);
+        if (color.equalsIgnoreCase("yellow")) g.setColor(Color.YELLOW);
     }
     
     protected void paintCross(Graphics g) {
@@ -218,21 +290,16 @@ public class Draw extends JFrame {
         for (Circle c : circles) {
             paintCircle(g, c);
         }
+        for (RegularPolygon ngon : ngons) {
+            paintRegularPolygon(g, ngon);
+        }
     }
     
     public static void main(String[] args) {
-        Vertex2D v1 = new Vertex2D(-100,-100);
-        Vertex2D v2 = new Vertex2D(0,100);
-        Vertex2D v3 = new Vertex2D(100,-100);
-        
-        Triangle tri = new Triangle(v1, v2, v3);
-        Circle   cir = new Circle(new Vertex2D(0,0), 100);
-        
+        RegularPolygon polygon = new RegularOctagon(new Vertex2D(0,0), 100);
         Draw canvas = new Draw();
-        canvas.paintTriangle(tri);
-        canvas.paintCircle(cir);
+        canvas.paintRegularPolygon(polygon);
         canvas.startPainting();
-
     }
 }
 
