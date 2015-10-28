@@ -8,14 +8,9 @@ package cz.muni.fi.pb162.project.geometry;
 /**
  * Represents circle (S,r).
  */
-public class Circle implements Solid {
+public class Circle extends GeneralRegularPolygon implements Solid{
 
-    private Vertex2D center;
     private double radius;
-
-    public Vertex2D getCenter() {
-        return center;
-    }
 
     public double getRadius() {
         return radius;
@@ -26,28 +21,19 @@ public class Circle implements Solid {
     }
 
     public Circle(Vertex2D center, double radius) {
-        this.center = center;
+        super(center,Integer.MAX_VALUE,0);
         this.radius = radius;
     }
 
     @Override
     public String toString() {
+        Vertex2D center = getCenter();
         return "Circle: center=[" + center.getX() + ", " + center.getY() + "], radius=" + getRadius();
     }
 
     @Override
     public double getArea() {
         return Math.PI * getRadius() * getRadius();
-    }
-
-    @Override
-    public double getWidth() {
-        return 2 * getRadius();
-    }
-
-    @Override
-    public double getHeight() {
-        return 2 * getRadius();
     }
 
     @Override
