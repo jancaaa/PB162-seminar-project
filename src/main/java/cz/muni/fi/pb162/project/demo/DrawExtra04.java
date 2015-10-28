@@ -1,8 +1,8 @@
 package cz.muni.fi.pb162.project.demo;
 
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
-//import cz.muni.fi.pb162.project.geometry.OlympicRings;
-//import cz.muni.fi.pb162.project.geometry.Square;
+import cz.muni.fi.pb162.project.geometry.OlympicRings;
+import cz.muni.fi.pb162.project.geometry.Square;
 
 /**
  * 
@@ -14,7 +14,7 @@ import cz.muni.fi.pb162.project.geometry.Vertex2D;
  */
 
 public class DrawExtra04 extends Draw {
-/*
+
     public static void main(String[] args) {
         Square square = new Square(new Vertex2D(0,0), 300);
         OlympicRings or = new OlympicRings(new Vertex2D(0,0), 50);
@@ -28,5 +28,5 @@ public class DrawExtra04 extends Draw {
         canvas.paintCircle(or.getGreenRing());
         canvas.startPainting();
     }
-*/
+
 }
