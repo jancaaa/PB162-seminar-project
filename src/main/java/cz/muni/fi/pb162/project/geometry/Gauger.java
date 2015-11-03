@@ -6,7 +6,7 @@ package cz.muni.fi.pb162.project.geometry;
  */
 
 /**
- *  Gauger.
+ * Gauger.
  */
 public class Gauger { //meridlo
 

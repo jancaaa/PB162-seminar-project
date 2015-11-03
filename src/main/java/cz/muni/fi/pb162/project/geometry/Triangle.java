@@ -56,6 +56,7 @@ public class Triangle implements Solid {
 
     /**
      * Determines if the triangle is divided or not
+     *
      * @return true - is divided, false - is not divided
      */
     public boolean isDivided() {
@@ -64,6 +65,7 @@ public class Triangle implements Solid {
 
     /**
      * Return i. subtriangle.
+     *
      * @param i subtriangle serial number (range: 0 .. 2)
      * @return subtriangle or null if i is not in range
      */
@@ -86,6 +88,7 @@ public class Triangle implements Solid {
 
     /**
      * Divides triangle to three subtriangles - creates Sierpinski triangle
+     *
      * @param depth - the number of divisions
      * @return true - triangle is divided, false - can not divide the triangle, depth =<0
      */
@@ -110,6 +113,7 @@ public class Triangle implements Solid {
 
     /**
      * Determines if the triangle is an equilateral triangle
+     *
      * @return true - is equilateral, false - is not equilateral
      */
     public boolean isEquilateral() {

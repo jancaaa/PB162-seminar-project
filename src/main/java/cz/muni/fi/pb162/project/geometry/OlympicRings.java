@@ -1,10 +1,12 @@
 package cz.muni.fi.pb162.project.geometry;
 
 /**
- *
  * @author: Jana Zahradnickova,  UCO 433598
  * @version: 28. 10. 2015
- *
+ */
+
+/**
+ * Represents the Olympics Rings.
  */
 public class OlympicRings {
     private Circle redRing;
@@ -16,7 +18,7 @@ public class OlympicRings {
     public OlympicRings(Vertex2D blackCenter, double radius) {
         double firstLineY = blackCenter.getY();
         double secondLineY = firstLineY - radius;
-        double space = radius/6; //space between 2 rings
+        double space = radius / 6; //space between 2 rings
 
         this.blackRing = new Circle(blackCenter, radius);
         blackRing.setColor("black");
@@ -27,10 +29,10 @@ public class OlympicRings {
         this.blueRing = generateCircle(blackCenter.getX() - 2 * radius - space, firstLineY, radius);
         blueRing.setColor("blue");
 
-        this.greenRing = generateCircle(blackCenter.getX()+radius+space/2,secondLineY,radius);
+        this.greenRing = generateCircle(blackCenter.getX() + radius + space / 2, secondLineY, radius);
         greenRing.setColor("green");
 
-        this.yellowRing = generateCircle(blackCenter.getX()-radius-space/2,secondLineY,radius);
+        this.yellowRing = generateCircle(blackCenter.getX() - radius - space / 2, secondLineY, radius);
         yellowRing.setColor("yellow");
     }
 

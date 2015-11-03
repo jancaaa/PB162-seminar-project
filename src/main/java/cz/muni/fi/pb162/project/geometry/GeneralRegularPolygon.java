@@ -1,10 +1,8 @@
 package cz.muni.fi.pb162.project.geometry;
 
 /**
- *
  * @author: Jana Zahradnickova,  UCO 433598
  * @version: 27. 10. 2015
- *
  */
 public class GeneralRegularPolygon implements RegularPolygon, Colored {
     private Vertex2D center;
