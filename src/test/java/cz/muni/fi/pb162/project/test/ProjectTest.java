@@ -2,11 +2,9 @@ package cz.muni.fi.pb162.project.test;
 
 import cz.muni.fi.pb162.project.test.BasicRulesTester;
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
-import cz.muni.fi.pb162.project.geometry.Circle;
-import cz.muni.fi.pb162.project.geometry.Colored;
-import cz.muni.fi.pb162.project.geometry.GeneralRegularPolygon;
-import cz.muni.fi.pb162.project.geometry.RegularOctagon;
-import cz.muni.fi.pb162.project.geometry.RegularPolygon;
+import cz.muni.fi.pb162.project.geometry.ArrayPolygon;
+import cz.muni.fi.pb162.project.geometry.SimplePolygon;
+import cz.muni.fi.pb162.project.geometry.Triangle;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -18,110 +16,126 @@ import org.junit.Test;
 public class ProjectTest {
     
     @Test public void task01() {
-        BasicRulesTester.testMethodsAndAttributes(GeneralRegularPolygon.class);
+        BasicRulesTester.testMethodsAndAttributes(SimplePolygon.class);
         
-        GeneralRegularPolygon pol = new GeneralRegularPolygon(new Vertex2D(1.0, -1.0), 8, 2.0);
-        assertTrue("Implementace rozhrani", pol instanceof RegularPolygon);
-        assertTrue("Implementace rozhrani", pol instanceof Colored);
-        assertTrue("getCenter()", pol.getCenter().getX() == 1.0 && pol.getCenter().getY() == -1.0);
-        assertEquals("getNumEdges()", 8, pol.getNumEdges());
-        assertTrue("getEdgeLength()", pol.getEdgeLength() == 2.0);
-        assertTrue("getRadius()", Math.abs(pol.getRadius() - 2.613125929752753) < 0.001);
-        assertTrue("getArea()", Math.abs(pol.getArea() - 19.31370849898476) < 0.001);
-        assertTrue("getWidth()", Math.abs(pol.getWidth() - 5.226251859505506) < 0.001);
-        assertTrue("getHeight()", Math.abs(pol.getHeight() - 5.226251859505506) < 0.001);
-        assertTrue("getLength()", Math.abs(pol.getLength() - 16.0) < 0.001);
-        assertEquals("getColor()", "black", pol.getColor());
-        pol.setColor("white");
-        assertEquals("setColor()", "white", pol.getColor());
-        assertEquals("toString()", "8-gon: center=[1.0, -1.0], edge length=2.0, color=white", pol.toString());
+        assertEquals("Trida SimplePolygon by nemela mit zadny atribut", 0, SimplePolygon.class.getDeclaredFields().length);
+        
+        BasicRulesTester.testAbstractMethod(SimplePolygon.class, "getVertex", int.class);
+        BasicRulesTester.testAbstractMethod(SimplePolygon.class, "getNumVertices", (Class<?>[]) null);
+        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getArea", (Class<?>[]) null);
+        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getWidth", (Class<?>[]) null);
+        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getHeight", (Class<?>[]) null);
+        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getLength", (Class<?>[]) null);
+        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "toString", (Class<?>[]) null);
+
+        SimplePolygon pol = new MockPolygon();
+        assertTrue("Chybny vypocet vysky polygonu", pol.getHeight() == 1.0);
+        assertTrue("Chybny vypocet sirky polygonu", pol.getWidth() == 2.0);
+        assertTrue("Chybny vypocet obvodu polygonu", Math.abs(pol.getLength() - 4.82842712474619) < 0.001);
+        assertTrue("Chybny vypocet obsahu polygonu", pol.getArea() == 1.0);
+        assertEquals("Chybny metoda toString", "Polygon: vertices = [-3.0, -1.0] [-2.0, -2.0] [-1.0, -1.0]", pol.toString());
     }
 
-    /*
     @Test public void task02() {
-        task = 2;
+        BasicRulesTester.testMethodsAndAttributes(ArrayPolygon.class);
+        BasicRulesTester.testAncestor(SimplePolygon.class, ArrayPolygon.class);
+        BasicRulesTester.testNonAbstractMethod(ArrayPolygon.class, "getVertex", int.class);
+        BasicRulesTester.testNonAbstractMethod(ArrayPolygon.class, "getNumVertices", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getArea", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getWidth", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getHeight", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getLength", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "toString", (Class<?>[]) null);
         
-        BasicRulesTester.testMethodsAndAttributes(SquareObsolete.class);
-        
-        SquareObsolete s = new SquareObsolete();
-        
-        assertTrue("Rozsireni nadtridy", s instanceof GeneralRegularPolygon);
-        assertEquals("Nadbytecne atributy", 0, SquareObsolete.class.getDeclaredFields().length);
         try {
-            SquareObsolete.class.getDeclaredMethod("toString");
-        } catch(NoSuchMethodException ex) {
-            fail("Chybi toString()");
+            new ArrayPolygon(null);
+        } catch(NullPointerException ex) {
+            // ok
+        } catch(IllegalArgumentException ex) {
+            // ok
+        } catch(Exception ex) {
+            fail("Neocekavana vyjimka " + ex + " pri volani konstruktoru ArrayPolygon(null)");
         }
-        assertEquals("Nadbytecne metody", 1, SquareObsolete.class.getDeclaredMethods().length);
-        assertEquals("toString()", "Square: 1.0x1.0, color=white",  s.toString());
         
-        pointsPerTest += 1.0;
-    }
-     */
-    
-    @Test public void task02() {
-        BasicRulesTester.testMethodsAndAttributes(RegularOctagon.class);
-        
-        RegularOctagon s = new RegularOctagon(new Vertex2D(1.0, -1.0), 2.0);
-        
-        assertTrue("Rozsireni nadtridy", s instanceof GeneralRegularPolygon);
-        assertEquals("Zbytecne atributy", 0, RegularOctagon.class.getDeclaredFields().length);
-        
-        if (RegularOctagon.class.getDeclaredMethods().length > 0) { // toString is acceptable
-            if (RegularOctagon.class.getDeclaredMethods().length == 1) {
-                try {
-                    RegularOctagon.class.getDeclaredMethod("toString");
-                } catch (NoSuchMethodException ex) {
-                    fail("Nadbytecne metody");
-                }
-            } else {
-                fail("Nadbytecne metody");
-            }
+        try {
+            new ArrayPolygon(new Vertex2D[] {new Vertex2D(-1,0), null, new Vertex2D(1,0)});
+        } catch(NullPointerException ex) {
+            // ok
+        } catch(IllegalArgumentException ex) {
+            // ok
+        } catch(Exception ex) {
+            fail("Neocekavana vyjimka " + ex + " pri volani konstruktoru s null vrcholem");
         }
+        
+        Vertex2D[] aPol = {new Vertex2D(-1,0), new Vertex2D(0,-1), new Vertex2D(0,1)};
+        SimplePolygon pol = new ArrayPolygon(aPol);
+        try {
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(0).getX() == -1.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(0).getY() == 0.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(1).getX() == 0.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(1).getY() == -1.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(2).getX() == 0.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(2).getY() == 1.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(3).getX() == -1.0);
+            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(3).getY() == 0.0);
+        } catch(IndexOutOfBoundsException ex) {
+            fail("Volani getVertex() zpusobuje vyhozeni vyjimky IndexOutOfBoudsException pro korektni indexy");
+        } catch(Exception ex) {
+            fail("Volani getVertex() zpusobuje vyhozeni neocekavane vyjimky " + ex);
+        }
+
+        try {
+            pol.getVertex(-1);
+            fail("Volani getVertex() se zapornym indexem nevyhazuje pozadovanou vyjimku");
+        } catch(IllegalArgumentException ex) {
+            // ok
+        } catch(Exception ex) {
+            fail("Volani getVertex() se zapornym indexem vyhazuje spatnou vyjimku " + ex);
+        }
+            
+        aPol[0] = new Vertex2D(2.0, 2.0);
+        assertTrue("Konsturktor nekopiruje pole, pouze uklada ukazatel", pol.getVertex(0).getX() == -1.0);
     }
 
     @Test public void task03() {
-        BasicRulesTester.testMethodsAndAttributes(Circle.class);
+        BasicRulesTester.testMethodsAndAttributes(Triangle.class);
+        BasicRulesTester.testAncestor(ArrayPolygon.class, Triangle.class);
         
-        Circle s = new Circle();
+        BasicRulesTester.testNonAbstractMethod(Triangle.class, "isEquilateral", (Class<?>[]) null);
         
-        assertTrue("Rozsireni nadtridy", s instanceof GeneralRegularPolygon);
-        assertEquals("Pocet atributu", 1, Circle.class.getDeclaredFields().length);
-        try {
-            Circle.class.getDeclaredMethod("getRadius");
-            Circle.class.getDeclaredMethod("getArea");
-            Circle.class.getDeclaredMethod("getLength");
-            Circle.class.getDeclaredMethod("toString");
-        } catch(NoSuchMethodException ex) {
-            fail("Chybi nektera prekryta metoda");
+        BasicRulesTester.testRedundantMethod(Triangle.class, "toString", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getArea", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getWidth", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getHeight", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getLength", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getVertexA", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getVertexB", (Class<?>[]) null);
+        BasicRulesTester.testRedundantMethod(Triangle.class, "getVertexC", (Class<?>[]) null);
+        
+        Triangle tri = new Triangle(new Vertex2D(-1,0), new Vertex2D(0,-1), new Vertex2D(0,1));
+        assertTrue("Chybny konstruktor", tri.getVertex(0).getX() == -1.0);
+        
+        assertEquals("Chybna metoda toString()", "Polygon: vertices = [-1.0, 0.0] [0.0, -1.0] [0.0, 1.0]", tri.toString());
+        assertTrue("getArea() dava spatny vysledek", Math.abs(tri.getArea() - 1.0) < 0.001);
+    }
+    
+    private class MockPolygon extends SimplePolygon {
+        
+        private Vertex2D[] vert = {
+            new Vertex2D(-3,-1),
+            new Vertex2D(-2,-2),
+            new Vertex2D(-1,-1)
+        };
+
+        @Override
+        public Vertex2D getVertex(int index) {
+            return vert[index%vert.length];
         }
-        assertEquals("Ve tride jsou nadbytecne metody", 4, Circle.class.getDeclaredMethods().length);
-        //assertEquals("toString()", "Circle: center=[0.0, 0.0], radius=1.0, color=white",  s.toString());
-        
-        assertEquals("Pocet hran", Integer.MAX_VALUE, s.getNumEdges());
-        assertTrue("Delka hran", s.getEdgeLength() == 0.0);
-        assertTrue("getHeight()", s.getHeight() == 2.0);
-        assertTrue("getLength()", Math.abs(s.getLength() - (Math.PI * 2.0)) < 0.001);
-        assertTrue("getArea()", Math.abs(s.getArea() - Math.PI) < 0.001);
+
+        @Override
+        public int getNumVertices() {
+            return vert.length;
+        }        
     }
 
-    /*
-    @Test public void task05() {
-        task = 5;
-        
-        Triangle tri = new Triangle(new Vertex2D(-1,0),new Vertex2D(1,0),new Vertex2D(0,1));
-        Method extentMethod = null;
-        try {
-            extentMethod = Triangle.class.getDeclaredMethod("extent", Boolean.TYPE);
-        } catch (NoSuchMethodException ex) {
-            fail("Chybi metoda extent");
-        }
-        
-        assertTrue("Viditelnost metody extent", Modifier.isProtected(extentMethod.getModifiers()));
-        assertTrue("getWidth", Math.abs(tri.getWidth() - 2.0) < 0.001);
-        assertTrue("getHeight", Math.abs(tri.getHeight() - 1.0) < 0.001);
-        
-        pointsPerTest += 0.5;
-    }
-     */
 }

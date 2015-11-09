@@ -1,5 +1,6 @@
 package cz.muni.fi.pb162.project.demo;
 
+import cz.muni.fi.pb162.project.demo.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -9,11 +10,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
 import cz.muni.fi.pb162.project.geometry.Solid;
-import cz.muni.fi.pb162.project.geometry.Triangle;
 import cz.muni.fi.pb162.project.geometry.Circle;
 import cz.muni.fi.pb162.project.geometry.Colored;
-import cz.muni.fi.pb162.project.geometry.RegularOctagon;
 import cz.muni.fi.pb162.project.geometry.RegularPolygon;
+import cz.muni.fi.pb162.project.geometry.ArrayPolygon;
+import cz.muni.fi.pb162.project.geometry.SimplePolygon;
+import cz.muni.fi.pb162.project.geometry.Triangle;
 
 /**
  * 
@@ -33,15 +35,17 @@ public class Draw extends JFrame {
 
     protected JPanel panel;
     
-    private List<Vertex2D> vertices    = new ArrayList<Vertex2D>();
-    private List<Triangle> triangles   = new ArrayList<Triangle>();
-    private List<Circle>   circles     = new ArrayList<Circle>();
-    private List<RegularPolygon> ngons = new ArrayList<RegularPolygon>();
+    private List<Vertex2D> vertices      = new ArrayList<Vertex2D>();
+    private List<Triangle> triangles     = new ArrayList<Triangle>();
+    private List<Circle>   circles       = new ArrayList<Circle>();
+    private List<RegularPolygon> ngons   = new ArrayList<RegularPolygon>();
+    private List<SimplePolygon> polygons = new ArrayList<SimplePolygon>();
     
     private Color vertexColor;
     private Color triangleColor;
     private Color circleColor;
     private Color ngonColor;
+    private Color polygonColor;
     
     /**
      * Defaultni konstruktor nastavi defaultni barvy pro telesa. Pozadi bile, body cervene, kruznice modre, trojuhelniky zelene
@@ -53,6 +57,7 @@ public class Draw extends JFrame {
         this.triangleColor = Color.BLUE;
         this.circleColor = Color.ORANGE;
         this.ngonColor = Color.BLACK;
+        this.polygonColor = Color.MAGENTA;
     }
     
     private void initialize() {
@@ -137,9 +142,9 @@ public class Draw extends JFrame {
         int halfX = width/2;
         int halfY = height/2;
         
-        Vertex2D a = triangle.getVertexA();
-        Vertex2D b = triangle.getVertexB();
-        Vertex2D c = triangle.getVertexC();
+        Vertex2D a = triangle.getVertex(0);
+        Vertex2D b = triangle.getVertex(1);
+        Vertex2D c = triangle.getVertex(2);
         
         int minX = width - ((int) Math.rint(halfX - Math.min(a.getX(), Math.min(b.getX(), c.getX()))));
         int maxX = width - ((int) Math.rint(halfX - Math.max(a.getX(), Math.max(b.getX(), c.getX()))));
@@ -178,6 +183,44 @@ public class Draw extends JFrame {
         return true;
     }
     
+    /**
+     * Metoda pro pridani jednoducheho polygonu do seznamu pro vykresleni.
+     * Metoda vraci logickou hodnotu v zavislosti na tom zda-li neni polygon mimo vykreslovaci prostor.
+     * 
+     * @param pol Polygon, ktery chci vykreslit
+     * @return true pokud se polygon vykresli, false nikoliv
+     */
+    public boolean paintSimplePolygon(SimplePolygon pol) {
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+        int halfX = width/2;
+        int halfY = height/2;
+        
+        int minX = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int minY = Integer.MAX_VALUE;
+        int maxY = Integer.MIN_VALUE;
+        
+        for (int i = 0; i < pol.getNumVertices(); i++) {
+            minX = (int) Math.min(minX, pol.getVertex(i%pol.getNumVertices()).getX());
+            maxX = (int) Math.min(maxX, pol.getVertex(i%pol.getNumVertices()).getX());
+            minY = (int) Math.min(minY, pol.getVertex(i%pol.getNumVertices()).getY());
+            maxY = (int) Math.min(maxY, pol.getVertex(i%pol.getNumVertices()).getY());
+        }
+        
+        minX = width - ((int) Math.rint(halfX - minX));
+        maxX = width - ((int) Math.rint(halfX - maxX));
+        minY = (int) Math.rint(halfY - minY);
+        maxY = (int) Math.rint(halfY - maxY);
+        
+        if (minX < 0 || maxX > width || minY < 0 || maxY > height) {
+            return false;
+        }
+        
+        polygons.add(pol);
+        return true;
+    }
+    
     protected void paintVertex(Graphics g, Vertex2D v) {
         int width = panel.getWidth();
         int height = panel.getHeight();
@@ -213,12 +256,12 @@ public class Draw extends JFrame {
         int halfX = width/2;
         int halfY = height/2;
         
-        int a1 = width - ((int) Math.rint(halfX - tri.getVertexA().getX()));
-        int a2 = (int) Math.rint(halfY - tri.getVertexA().getY());
-        int b1 = width - ((int) Math.rint(halfX - tri.getVertexB().getX()));
-        int b2 = (int) Math.rint(halfY - tri.getVertexB().getY());
-        int c1 = width - ((int) Math.rint(halfX - tri.getVertexC().getX()));
-        int c2 = (int) Math.rint(halfY - tri.getVertexC().getY());
+        int a1 = width - ((int) Math.rint(halfX - tri.getVertex(0).getX()));
+        int a2 = (int) Math.rint(halfY - tri.getVertex(0).getY());
+        int b1 = width - ((int) Math.rint(halfX - tri.getVertex(1).getX()));
+        int b2 = (int) Math.rint(halfY - tri.getVertex(1).getY());
+        int c1 = width - ((int) Math.rint(halfX - tri.getVertex(2).getX()));
+        int c2 = (int) Math.rint(halfY - tri.getVertex(2).getY());
 
         setColor(g, tri, triangleColor);
         Polygon triangle = new Polygon();
@@ -251,6 +294,24 @@ public class Draw extends JFrame {
         g.drawPolygon(xVertex, yVertex, polygon.getNumEdges());
     }
     
+    protected void paintSimplePolygon(Graphics g, SimplePolygon polygon) {
+        int width = panel.getWidth();
+        int height = panel.getHeight();
+        int halfX = width/2;
+        int halfY = height/2;
+        
+        int[] yVertex = new int[polygon.getNumVertices()+1];
+        int[] xVertex = new int[polygon.getNumVertices()+1];
+        
+        for (int i = 0; i <= polygon.getNumVertices(); i++) {
+            xVertex[i] = width - ((int) Math.rint(halfX - polygon.getVertex(i%polygon.getNumVertices()).getX()));
+            yVertex[i] = (int) Math.rint(halfY - polygon.getVertex(i%polygon.getNumVertices()).getY());
+        }
+        
+        setColor(g, polygon, polygonColor);
+        g.drawPolygon(xVertex, yVertex, polygon.getNumVertices()+1);
+    }
+    
     protected void setColor(Graphics g, Solid obj, Color defaultColor) {
         g.setColor(defaultColor);
         
@@ -266,6 +327,7 @@ public class Draw extends JFrame {
         if (color.equalsIgnoreCase("orange")) g.setColor(Color.ORANGE);
         if (color.equalsIgnoreCase("red")) g.setColor(Color.RED);
         if (color.equalsIgnoreCase("yellow")) g.setColor(Color.YELLOW);
+        if (color.equalsIgnoreCase("magenta")) g.setColor(Color.MAGENTA);
     }
     
     protected void paintCross(Graphics g) {
@@ -293,12 +355,24 @@ public class Draw extends JFrame {
         for (RegularPolygon ngon : ngons) {
             paintRegularPolygon(g, ngon);
         }
+        for (SimplePolygon pol : polygons) {
+            paintSimplePolygon(g, pol);
+        }
     }
     
     public static void main(String[] args) {
-        RegularPolygon polygon = new RegularOctagon(new Vertex2D(0,0), 100);
+        Vertex2D[] vert1 = {
+            new Vertex2D(-100,-100),
+            new Vertex2D( -40,  10),
+            new Vertex2D(  50,  20),
+            new Vertex2D(  10, -20),
+            new Vertex2D(  60, -40)
+        };
+        SimplePolygon tri = new Triangle(new Vertex2D(-200, -200), new Vertex2D(0, 200), new Vertex2D(200, -200));
+        SimplePolygon pol = new ArrayPolygon(vert1);
         Draw canvas = new Draw();
-        canvas.paintRegularPolygon(polygon);
+        canvas.paintSimplePolygon(pol);
+        canvas.paintSimplePolygon(tri);
         canvas.startPainting();
     }
 }

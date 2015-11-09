@@ -1,6 +1,5 @@
 package cz.muni.fi.pb162.project.geometry;
 
-
 /**
  * Interface for convex regular polygons, e.g. equilateral triangle, suqare, regular octagon, etc..
  *
