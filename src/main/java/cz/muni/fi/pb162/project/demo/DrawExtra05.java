@@ -4,8 +4,8 @@ import cz.muni.fi.pb162.project.demo.*;
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
 import cz.muni.fi.pb162.project.geometry.OlympicRings;
 import cz.muni.fi.pb162.project.geometry.Square;
-//import cz.muni.fi.pb162.project.geometry.ArrayPolygon;
-//import cz.muni.fi.pb162.project.geometry.SimplePolygon;
+import cz.muni.fi.pb162.project.geometry.ArrayPolygon;
+import cz.muni.fi.pb162.project.geometry.SimplePolygon;
 import cz.muni.fi.pb162.project.geometry.Triangle;
 
 /**
@@ -20,7 +20,7 @@ import cz.muni.fi.pb162.project.geometry.Triangle;
 public class DrawExtra05 extends Draw {
 
     public static void main(String[] args) {
-        /*
+
         Vertex2D[] vert1 = {
             new Vertex2D(-100,-100),
             new Vertex2D( -40,  10),
@@ -64,6 +64,6 @@ public class DrawExtra05 extends Draw {
         } else {
             System.out.println("GRATUJEME - Zda se, ze metoda compare() je spravne");
         }
-        */
+
     }
 }

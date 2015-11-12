@@ -8,12 +8,14 @@ package cz.muni.fi.pb162.project.geometry;
 /**
  * Represents triangle ABC.
  */
-public class Triangle implements Solid {
+public class Triangle extends ArrayPolygon implements Solid {
 
     //vertices
     private Vertex2D vertexA;
     private Vertex2D vertexB;
     private Vertex2D vertexC;
+
+    private Vertex2D[] vertices;
 
     //subtriangles
     private Triangle t1 = null;
@@ -22,36 +24,15 @@ public class Triangle implements Solid {
 
     public static final double EPS = 0.001;
 
-    public Vertex2D getVertexA() {
-        return vertexA;
-    }
-
-    public Vertex2D getVertexB() {
-        return vertexB;
-    }
-
-    public Vertex2D getVertexC() {
-        return vertexC;
-    }
-
     public Triangle(Vertex2D vertexA, Vertex2D vertexB, Vertex2D vertexC) {
-        this.vertexA = vertexA;
-        this.vertexB = vertexB;
-        this.vertexC = vertexC;
+        super(new Vertex2D[]{vertexA, vertexB, vertexC});
+        vertices = new Vertex2D[]{vertexA, vertexB, vertexC};
     }
 
     public Triangle(Vertex2D vertexA, Vertex2D vertexB, Vertex2D vertexC, int depth) {
         this(vertexA, vertexB, vertexC);
         this.divide(depth);
 
-    }
-
-    @Override
-    public String toString() {
-        if (vertexA == null || vertexB == null || vertexC == null)
-            return "INVALID TRIANGLE";
-        else
-            return "Triangle: vertices=" + vertexA.toString() + " " + vertexB.toString() + " " + vertexC.toString();
     }
 
     /**
@@ -117,50 +98,9 @@ public class Triangle implements Solid {
      * @return true - is equilateral, false - is not equilateral
      */
     public boolean isEquilateral() {
-        double a = this.vertexB.distance(this.vertexC);
-        double b = this.vertexA.distance(this.vertexC);
-        double c = this.vertexA.distance(this.vertexB);
+        double a = this.vertices[1].distance(this.vertices[2]);
+        double b = this.vertices[0].distance(this.vertices[2]);
+        double c = this.vertices[0].distance(this.vertices[1]);
         return (Math.abs(a - b) < EPS && Math.abs(b - c) < EPS && Math.abs(a - c) < EPS);
-    }
-
-    @Override
-    public double getArea() {
-        double a = this.vertexB.distance(this.vertexC);
-        double b = this.vertexA.distance(this.vertexC);
-        double c = this.vertexA.distance(this.vertexB);
-        double s = (a + b + c) / 2;
-        return Math.sqrt(s * (s - a) * (s - b) * (s - c));
-    }
-
-    @Override
-    public double getWidth() {
-        double pom1 = vertexA.getX();
-        double pom2 = vertexB.getX();
-        double pom3 = vertexC.getX();
-        double maxX;
-        double minX;
-        maxX = Math.max(Math.max(pom1, pom2), pom3);
-        minX = Math.min(Math.min(pom1, pom2), pom3);
-        return maxX - minX;
-    }
-
-    @Override
-    public double getHeight() {
-        double pom1 = vertexA.getY();
-        double pom2 = vertexB.getY();
-        double pom3 = vertexC.getY();
-        double maxY;
-        double minY;
-        maxY = Math.max(Math.max(pom1, pom2), pom3);
-        minY = Math.min(Math.min(pom1, pom2), pom3);
-        return maxY - minY;
-    }
-
-    @Override
-    public double getLength() { //obvod
-        double a = this.vertexB.distance(this.vertexC);
-        double b = this.vertexA.distance(this.vertexC);
-        double c = this.vertexA.distance(this.vertexB);
-        return a + b + c;
     }
 }
