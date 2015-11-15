@@ -43,7 +43,7 @@ public class ArrayPolygon extends SimplePolygon {
     }
 
     /**
-     * Tests if polygons are alike meaning they have the same coordinates of vertices in the same or inverted order
+     * Tests if polygons are the same alike meaning they have the same coordinates of vertices in the same or inverted order
      *
      * @param pol - Array polygon to be tested
      * @return true - polygons are the same, false - polygons are not the same
@@ -52,53 +52,30 @@ public class ArrayPolygon extends SimplePolygon {
         if (getNumVertices() != pol.getNumVertices())
             return false; //different number of vertices
 
-        if (testSimilarity(pol)) //the same
-            return true;
-        ArrayPolygon shiftedPolygon = pol;
-        for (int i = 1; i < getNumVertices(); i++) {
-            shiftedPolygon = shiftedPolygon.shiftArray();
-            if (testSimilarity(shiftedPolygon)) //shifted
+        for (int i = 0; i < getNumVertices(); i++) {
+            if (testSimilarity(pol, i))
                 return true;
         }
 
         ArrayPolygon invertedPolygon = pol.invert();
 
-        if (testSimilarity(invertedPolygon)) //inverted
-            return true;
-
-        ArrayPolygon invertedShiftedPolygon = invertedPolygon;
-        for (int i = 1; i < getNumVertices(); i++) {
-            invertedShiftedPolygon = invertedShiftedPolygon.shiftArray();
-            if (testSimilarity(invertedShiftedPolygon)) //inverted and shifted
+        for (int i = 0; i < getNumVertices(); i++) {
+            if (testSimilarity(invertedPolygon, i))
                 return true;
         }
         return false;
     }
 
     /**
-     * Shifts vertices is ArrayPolygon one left
+     * Tests if two polygons are the same
      *
-     * @return ArrayPolygon with shifted vertices
+     * @param pol Array polygon to be tested
+     * @param offset
+     * @return true - polygons are the same, false - polygons are not the same
      */
-    private ArrayPolygon shiftArray() {
-        Vertex2D[] shiftedArray = new Vertex2D[vertices.length];
-        Vertex2D pom = vertices[0];
-        for (int i = 1; i < getNumVertices(); i++) {
-            shiftedArray[i - 1] = vertices[i];
-        }
-        shiftedArray[getNumVertices() - 1] = pom;
-        return new ArrayPolygon(shiftedArray);
-    }
-
-    /**
-     * Tests if two polygons are the same (has the same vertices array)
-     *
-     * @param pol ArrayPolygon to be tested
-     * @return true - polygons are the same, false - polygons are the same
-     */
-    private boolean testSimilarity(ArrayPolygon pol) {
+    private boolean testSimilarity(ArrayPolygon pol, int offset) {
         for (int i = 0; i < getNumVertices(); i++) {
-            if (!((vertices[i].getX() == pol.getVertex(i).getX()) && (vertices[i].getY() == pol.getVertex(i).getY()))) {
+            if (!((vertices[i].getX() == pol.getVertex(i + offset).getX()) && (vertices[i].getY() == pol.getVertex(i + offset).getY()))) {
                 return false;
             }
         }
