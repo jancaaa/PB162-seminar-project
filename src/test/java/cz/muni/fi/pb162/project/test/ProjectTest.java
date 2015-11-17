@@ -1,10 +1,17 @@
 package cz.muni.fi.pb162.project.test;
 
-import cz.muni.fi.pb162.project.test.BasicRulesTester;
-import cz.muni.fi.pb162.project.geometry.Vertex2D;
-import cz.muni.fi.pb162.project.geometry.ArrayPolygon;
-import cz.muni.fi.pb162.project.geometry.SimplePolygon;
-import cz.muni.fi.pb162.project.geometry.Triangle;
+import java.io.IOException;
+import java.net.NoRouteToHostException;
+import java.net.UnknownHostException;
+import cz.muni.fi.pb162.project.geometry.Circle;
+import cz.muni.fi.pb162.project.db.CannotStoreException;
+import cz.muni.fi.pb162.project.db.Connection;
+import cz.muni.fi.pb162.project.db.Connector;
+import cz.muni.fi.pb162.project.db.DbException;
+import cz.muni.fi.pb162.project.db.DbUnreachableException;
+import cz.muni.fi.pb162.project.db.MyStorage;
+import cz.muni.fi.pb162.project.db.Storage;
+import cz.muni.fi.pb162.project.db.UnreliableConnector;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -16,126 +23,279 @@ import org.junit.Test;
 public class ProjectTest {
     
     @Test public void task01() {
-        BasicRulesTester.testMethodsAndAttributes(SimplePolygon.class);
+        BasicRulesTester.testAncestor(Exception.class, DbException.class);
+        BasicRulesTester.testAncestor(DbException.class, DbUnreachableException.class);
+        BasicRulesTester.testAncestor(DbException.class, CannotStoreException.class);
         
-        assertEquals("Trida SimplePolygon by nemela mit zadny atribut", 0, SimplePolygon.class.getDeclaredFields().length);
-        
-        BasicRulesTester.testAbstractMethod(SimplePolygon.class, "getVertex", int.class);
-        BasicRulesTester.testAbstractMethod(SimplePolygon.class, "getNumVertices", (Class<?>[]) null);
-        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getArea", (Class<?>[]) null);
-        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getWidth", (Class<?>[]) null);
-        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getHeight", (Class<?>[]) null);
-        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "getLength", (Class<?>[]) null);
-        BasicRulesTester.testNonAbstractMethod(SimplePolygon.class, "toString", (Class<?>[]) null);
-
-        SimplePolygon pol = new MockPolygon();
-        assertTrue("Chybny vypocet vysky polygonu", pol.getHeight() == 1.0);
-        assertTrue("Chybny vypocet sirky polygonu", pol.getWidth() == 2.0);
-        assertTrue("Chybny vypocet obvodu polygonu", Math.abs(pol.getLength() - 4.82842712474619) < 0.001);
-        assertTrue("Chybny vypocet obsahu polygonu", pol.getArea() == 1.0);
-        assertEquals("Chybny metoda toString", "Polygon: vertices = [-3.0, -1.0] [-2.0, -2.0] [-1.0, -1.0]", pol.toString());
+        try {
+            DbException.class.getConstructor(String.class, Throwable.class);
+            DbUnreachableException.class.getConstructor(String.class, Throwable.class);
+            CannotStoreException.class.getConstructor(String.class, Throwable.class);
+        } catch (NoSuchMethodException ex) {
+            fail("Vyjimky maji umoznit nastavit chybovou hlasku a zaroven pricinu");
+        }
     }
 
     @Test public void task02() {
-        BasicRulesTester.testMethodsAndAttributes(ArrayPolygon.class);
-        BasicRulesTester.testAncestor(SimplePolygon.class, ArrayPolygon.class);
-        BasicRulesTester.testNonAbstractMethod(ArrayPolygon.class, "getVertex", int.class);
-        BasicRulesTester.testNonAbstractMethod(ArrayPolygon.class, "getNumVertices", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getArea", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getWidth", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getHeight", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "getLength", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(ArrayPolygon.class, "toString", (Class<?>[]) null);
+        assertTrue("MyStorage neimplementuje rozhrani Storage", 
+                new MyStorage(new TestConnector(), 1) instanceof Storage);
         
+        // test MyStorage with null Connector
         try {
-            new ArrayPolygon(null);
-        } catch(NullPointerException ex) {
-            // ok
-        } catch(IllegalArgumentException ex) {
-            // ok
-        } catch(Exception ex) {
-            fail("Neocekavana vyjimka " + ex + " pri volani konstruktoru ArrayPolygon(null)");
-        }
+            Storage st = new MyStorage(null,1);
+	    fail("Podarilo se vytvorit instanci tridy MyStorage s parametrem " +
+		    "connector = null, aniz by konstruktor vyhodil vyjimku " +
+		    "NullPointerException nebo IllegalArgumentException");
+	} catch (NullPointerException e) {
+	    assertTrue("Vyjimka vyhozena konstruktorem " +
+		    "MyStorage by jako popis chyby mela " +
+		    "obsahovat nazev chybneho parametru",e.getMessage().contains("connector"));
+	} catch (IllegalArgumentException e) {
+	    assertTrue("Vyjimka vyhozena konstruktorem " +
+		    "MyStorage by jako popis chyby mela " +
+		    "obsahovat nazev chybneho parametru",e.getMessage().contains("connector"));
+	}
         
+        // test MyStorage with wrong retries
         try {
-            new ArrayPolygon(new Vertex2D[] {new Vertex2D(-1,0), null, new Vertex2D(1,0)});
-        } catch(NullPointerException ex) {
-            // ok
-        } catch(IllegalArgumentException ex) {
-            // ok
-        } catch(Exception ex) {
-            fail("Neocekavana vyjimka " + ex + " pri volani konstruktoru s null vrcholem");
-        }
+	    Storage st = new MyStorage(new UnreliableConnector(),-1);
+	    fail("Podarilo se vytvorit instanci tridy MyStorage se zapornym" +
+		    " poctem opakovani (retries), aniz by konstruktor vyhodil " +
+		    "vyjimku IllegalArgumentException");
+	} catch (IllegalArgumentException e) {
+	    assertTrue("Vyjimka IllegalArgumentException vyhozena konstruktorem " +
+		    "MyStorage by jako popis chyby mela " +
+		    "obsahovat nazev chybneho parametru",
+		    e.getMessage().contains("maxAttempts"));
+	}
+	try {
+            Storage st = new MyStorage(new UnreliableConnector(),0);
+	    fail("Podarilo se vytvorit instanci tridy MyStorage s nulovym" +
+		    " poctem opakovani (retries), aniz by konstruktor vyhodil " +
+		    "vyjimku IllegalArgumentException");
+	} catch (IllegalArgumentException e) {
+	    assertTrue("Vyjimka IllegalArgumentException vyhozena konstruktorem " +
+		    "MyStorage by jako popis chyby mela " +
+		    "obsahovat nazev chybneho parametru",
+		    e.getMessage().contains("maxAttempts"));
+	}
         
-        Vertex2D[] aPol = {new Vertex2D(-1,0), new Vertex2D(0,-1), new Vertex2D(0,1)};
-        SimplePolygon pol = new ArrayPolygon(aPol);
+        // test send data
+        TestConnector connector = new TestConnector();
+        Storage st = new MyStorage(connector,1);
+        Circle circle = new Circle();
+	try {
+	    st.store("address1", circle);
+	} catch (Exception ex) {
+	    fail("Metoda Storage.store() vyhodila neocekavane vyjimky " + ex);
+	}
+	assertEquals("Spojeni nebylo navazano se spravnou adresou","" +
+		"address1",connector.host);
+	assertEquals("Pri posilani gr. objektu na vzdaleny server nebyl objekt predan konektoru",
+		circle,connector.sentData);
+	assertEquals("Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+	assertEquals("Metoda Connection.sendData() byla zbytecne volana vicekrat",
+		1,connector.sendDataCounter);
+        
+        // multiple invocation of store()
+        connector.getConnectionCounter = 0;
+        connector.sendDataCounter = 0;
         try {
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(0).getX() == -1.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(0).getY() == 0.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(1).getX() == 0.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(1).getY() == -1.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(2).getX() == 0.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(2).getY() == 1.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(3).getX() == -1.0);
-            assertTrue("Volani getVertex() vraci chybny vysledek", pol.getVertex(3).getY() == 0.0);
-        } catch(IndexOutOfBoundsException ex) {
-            fail("Volani getVertex() zpusobuje vyhozeni vyjimky IndexOutOfBoudsException pro korektni indexy");
-        } catch(Exception ex) {
-            fail("Volani getVertex() zpusobuje vyhozeni neocekavane vyjimky " + ex);
-        }
+	    st.store("address1", circle);
+	} catch (Exception ex) {
+	    fail("Opakovane volani metody Storage.store() vyvolalo neocekavanou vyjimku " + ex);
+	}
+	assertEquals("Opakovane volani metody Storage.store(): Spojeni nebylo navazano se spravnou adresou","" +
+		"address1",connector.host);
+	assertEquals("Opakovane volani metody Storage.store(): Pri posilani gr. objektu na vzdaleny server nebyl objekt predan konektoru",
+		circle,connector.sentData);
+	assertEquals("Opakovane volani metody Storage.store(): Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+	assertEquals("Opakovane volani metody Storage.store(): Metoda Connection.sendData() byla zbytecne volana vicekrat",
+		1,connector.sendDataCounter);
+        
+        // test connection with unknown host
+        connector = new TestConnector();
+	st = new MyStorage(connector,5);
+        connector.connectionException = new UnknownHostException();
+	try {
+	    st.store("address1", circle);
+	    fail("Metoda MyStorage.store() nevyhodi vyjimku, " +
+		    "ackoliv se nepodarilo navazat spojeni a metoda " +
+		    "Connector.getConnection() vyhodila vyjimku UnknownHostException");
+	} catch (DbUnreachableException ex) {
+	    assertSame("Vyjimka DbUnreachableException vyvolana jako reakce na " +
+		    "vyjimku UnknownHostException nema spravne nastavenou " +
+		    "svoji pricinu",connector.connectionException,ex.getCause());
+	    assertNotNull("Vyjimka DbUnreachableException vyvolana jako reakce na " +
+		    "vyjimku UnknownHostException nema nastavenou smysluplnou zpravu " +
+		    "o chybe",ex.getMessage());
+	} catch (Exception ex) {
+	    fail("Metoda MyStorage.store() misto ocekavane vyjimky " +
+		    "DbUnreachableException vyhodila vyjimku " + ex);
+	}
+	assertEquals("Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+        
+        
+        // test connection with no route to host
+        connector = new TestConnector();
+	st = new MyStorage(connector,5);
+        connector.connectionException = new NoRouteToHostException();
+	try {
+            st.store("address1", circle);
+	    fail("Metoda MyStorage.store() nevyhodi vyjimku, " +
+		    "ackoliv se nepodarilo navazat spojeni a metoda " +
+		    "Connector.getConnection() vyhodila vyjimku NoRouteToHostException");
+	} catch (DbUnreachableException ex) {
+	    assertSame("Vyjimka DbUnreachableException vyvolana jako reakce na " +
+		    "vyjimku NoRouteToHostException nema spravne nastavenou " +
+		    "svoji pricinu",connector.connectionException,ex.getCause());
+	    assertNotNull("Vyjimka DbUnreachableException vyvolana jako reakce na " +
+		    "vyjimku NoRouteToHostException nema nastavenou smysluplnou zpravu " +
+		    "o chybe",ex.getMessage());
+	} catch (Exception ex) {
+	    fail("Metoda MyStorage.store() misto ocekavane vyjimky " +
+		    "DbUnreachableException vyhodila vyjimku " + ex);
+	}
+	assertEquals("Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+        
+        
+        // test sending data with error and no retry
+        connector = new TestConnector();
+        st = new MyStorage(connector,1);
+	connector.dataException = new IOException();
+	connector.dataExceptionCounter = 1;
+	try {
+            st.store("address1", circle);
+	    fail("Metoda MyStorage.store() nevyhodi vyjimku, " +
+		    "ackoliv se nepodarilo poslat data a metoda " +
+		    "Connection.sendData() vyhodila vyjimku IOException");
+	} catch (CannotStoreException ex) {
+	    assertSame("Vyjimka CannotStoreException vyvolana jako reakce na " +
+		    "vyjimku IOException nema spravne nastavenou " +
+		    "svoji pricinu",connector.dataException,ex.getCause());
+	    assertNotNull("Vyjimka CannotStoreExceptionvyvolana jako reakce na " +
+		    "vyjimku IOException nema nastavenou smysluplnou zpravu " +
+		    "o chybe",ex.getMessage());
+	} catch (Exception ex) {
+	    fail("Metoda MyStorage.store() misto ocekavane vyjimky " +
+		    "CannotStoreException vyhodila vyjimku " + ex);
+	}
+	assertEquals("Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+	assertEquals("Metoda Connection.sendData() byla zbytecne volana vicekrat",
+		1,connector.sendDataCounter);
+        
+        
+        // test sending data with error and retry is ok
+        connector = new TestConnector();
+        st = new MyStorage(connector,2);
+	connector.dataException = new IOException();
+	connector.dataExceptionCounter = 1;
+	try {
+            st.store("address1", circle);
+	} catch (Exception ex) {
+	    fail("Metoda MyStorage.store() vyhodila neocekavane vyjimku " 
+		    + ex + " (jde o situaci, kdy napoprve metoda " +
+		    "Connection.sendData() vyhodi vyjimku a az teprve napodruhe " +
+		    "uspeje)");
+	}
+	assertEquals("Pri posilani gr. objektu na vzdaleny server nebyl objekt predan konektoru",
+		circle,connector.sentData);
+	assertEquals("Spojeni nebylo navazano se spravnou adresou","" +
+		"address1",connector.host);
+	assertEquals("Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+	assertEquals("Metoda Connection.sendData() byla zbytecne volana vicekrat",
+		2,connector.sendDataCounter);
+        
+        
+        // test sending data with error and retry is not ok
+        connector = new TestConnector();
+        st = new MyStorage(connector,2);
+        connector.dataException = new IOException();
+	connector.dataExceptionCounter = 2;
 
-        try {
-            pol.getVertex(-1);
-            fail("Volani getVertex() se zapornym indexem nevyhazuje pozadovanou vyjimku");
-        } catch(IllegalArgumentException ex) {
-            // ok
-        } catch(Exception ex) {
-            fail("Volani getVertex() se zapornym indexem vyhazuje spatnou vyjimku " + ex);
+	try {
+            st.store("address1", circle);
+	    fail("Metoda MyStorage.store() nevyhodi vyjimku, " +
+		    "ackoliv se nepodarilo poslat data ani napodruhe a pocet " +
+		    "opakovani byl nastaven na dve");
+	} catch (CannotStoreException ex) {
+	    assertSame("Vyjimka CannotStoreException vyvolana jako reakce na " +
+		    "vyjimku IOException nema spravne nastavenou " +
+		    "svoji pricinu",connector.dataException,ex.getCause());
+	    assertNotNull("Vyjimka CannotStoreExceptionvyvolana jako reakce na " +
+		    "vyjimku IOException nema nastavenou smysluplnou zpravu " +
+		    "o chybe",ex.getMessage());
+	} catch (Exception ex) {
+	    fail("Metoda MyStorage.store() misto ocekavane vyjimky " +
+		    "CannotStoreException vyhodila vyjimku " + ex);
+	}
+	assertEquals("Metoda Connector.getConnection() byla zbytecne volana vicekrat",
+		1,connector.getConnectionCounter);
+	assertEquals("Metoda Connection.sendData() byla zbytecne volana vicekrat",
+		2,connector.sendDataCounter);
+                
+        // test catching Exception instead of UnknownHostException and NoRouteToHostException
+        st = new MyStorage(new FailConnector(), 1);
+        circle = new Circle();
+	try {
+	    st.store("address1", circle);
+	} catch (IllegalStateException ex) {
+	    // ok
+	} catch (Exception ex) {
+            fail("Metoda Storage.store() zachytava uplne vsechny vyjimky " + ex);
         }
-            
-        aPol[0] = new Vertex2D(2.0, 2.0);
-        assertTrue("Konsturktor nekopiruje pole, pouze uklada ukazatel", pol.getVertex(0).getX() == -1.0);
-    }
-
-    @Test public void task03() {
-        BasicRulesTester.testMethodsAndAttributes(Triangle.class);
-        BasicRulesTester.testAncestor(ArrayPolygon.class, Triangle.class);
-        
-        BasicRulesTester.testNonAbstractMethod(Triangle.class, "isEquilateral", (Class<?>[]) null);
-        
-        BasicRulesTester.testRedundantMethod(Triangle.class, "toString", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getArea", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getWidth", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getHeight", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getLength", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getVertexA", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getVertexB", (Class<?>[]) null);
-        BasicRulesTester.testRedundantMethod(Triangle.class, "getVertexC", (Class<?>[]) null);
-        
-        Triangle tri = new Triangle(new Vertex2D(-1,0), new Vertex2D(0,-1), new Vertex2D(0,1));
-        assertTrue("Chybny konstruktor", tri.getVertex(0).getX() == -1.0);
-        
-        assertEquals("Chybna metoda toString()", "Polygon: vertices = [-1.0, 0.0] [0.0, -1.0] [0.0, 1.0]", tri.toString());
-        assertTrue("getArea() dava spatny vysledek", Math.abs(tri.getArea() - 1.0) < 0.001);
     }
     
-    private class MockPolygon extends SimplePolygon {
-        
-        private Vertex2D[] vert = {
-            new Vertex2D(-3,-1),
-            new Vertex2D(-2,-2),
-            new Vertex2D(-1,-1)
-        };
-
+    
+    
+    private static class TestConnector implements Connector {
+	
+	private IOException dataException;
+	private IOException connectionException;
+	private int dataExceptionCounter;
+	private Object sentData;
+	private String host;
+	private int getConnectionCounter;
+	private int sendDataCounter;
+	
         @Override
-        public Vertex2D getVertex(int index) {
-            return vert[index%vert.length];
-        }
-
-        @Override
-        public int getNumVertices() {
-            return vert.length;
-        }        
+	public Connection getConnection(String target) throws
+		UnknownHostException, NoRouteToHostException 
+        {
+	    getConnectionCounter++;
+	    if (connectionException instanceof NoRouteToHostException) {
+		throw (NoRouteToHostException) connectionException;
+	    } else if (connectionException instanceof UnknownHostException) {
+		throw (UnknownHostException) connectionException;
+	    } else {
+		host = target;
+		return new Connection() {
+                    @Override
+		    public void sendData(Object data) throws IOException {
+			sendDataCounter++;
+			if (dataExceptionCounter-- > 0 && dataException != null) {
+			    throw dataException;
+			}
+			sentData = data;
+		    }
+		};
+	    }
+	}
     }
 
+    private static class FailConnector implements Connector {
+	
+        @Override
+	public Connection getConnection(String target) throws
+		UnknownHostException, NoRouteToHostException 
+        {
+            throw new IllegalStateException();
+	}
+    }
 }
