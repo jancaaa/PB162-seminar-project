@@ -79,4 +79,50 @@ public class GeneralRegularPolygon implements RegularPolygon, Colored {
                 "], edge length=" + getEdgeLength() +
                 ", color=" + getColor();
     }
+
+    /**
+     * Returns vertex at given index modulo number of indices.
+     *
+     * @param index vertex index
+     * @return vertex at given index modulo number of indices
+     * @throws IllegalArgumentException if index is negative
+     */
+    @Override
+    public Vertex2D getVertex(int index) throws IllegalArgumentException {
+        if (index < 0) {
+            throw new IllegalArgumentException("Index is below zero!");
+        } else {
+            double x = getCenter().getX() - getRadius() * Math.cos(index * 2 * Math.PI / getNumVertices());
+            double y = getCenter().getY() - getRadius() * Math.sin(index * 2 * Math.PI / getNumVertices());
+            return new Vertex2D(x, y);
+        }
+    }
+
+    /**
+     * Returns number of vertices of the polygon.
+     *
+     * @return number of vertices
+     */
+    @Override
+    public int getNumVertices() {
+        return getNumEdges();
+    }
+
+    /**
+     * Creates array of triangles dividing simple regular polygon.
+     *
+     * @return Array of triangles
+     */
+    public Triangle[] triangulate() {
+        Triangle[] triangles = new Triangle[getNumEdges()];
+        Vertex2D polygonCenter = new Vertex2D(center.getX(), center.getY());
+        Vertex2D pom1;
+        Vertex2D pom2;
+        for (int i = 0; i < getNumEdges(); i++) {
+            pom1 = new Vertex2D(getVertex(i).getX(), getVertex(i).getY());
+            pom2 = new Vertex2D(getVertex(i + 1).getX(), getVertex(i + 1).getY());
+            triangles[i] = new Triangle(polygonCenter, pom1, pom2);
+        }
+        return triangles;
+    }
 }

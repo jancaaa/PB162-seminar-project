@@ -6,7 +6,7 @@ package cz.muni.fi.pb162.project.geometry;
  * 
  * @author Radek Oslejsek &lt;oslejsek@fi.muni.cz&gt;, Masaryk University, Faculty of Informatics
  */
-public interface RegularPolygon  extends Solid {
+public interface RegularPolygon extends Solid, Polygon {
 
     /**
      * Returns number of edges of the regular polygon.
