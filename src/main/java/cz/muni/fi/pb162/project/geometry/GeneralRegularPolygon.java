@@ -115,12 +115,12 @@ public class GeneralRegularPolygon implements RegularPolygon, Colored {
      */
     public Triangle[] triangulate() {
         Triangle[] triangles = new Triangle[getNumEdges()];
-        Vertex2D polygonCenter = new Vertex2D(center.getX(), center.getY());
+        Vertex2D polygonCenter = getCenter();
         Vertex2D pom1;
         Vertex2D pom2;
         for (int i = 0; i < getNumEdges(); i++) {
-            pom1 = new Vertex2D(getVertex(i).getX(), getVertex(i).getY());
-            pom2 = new Vertex2D(getVertex(i + 1).getX(), getVertex(i + 1).getY());
+            pom1 = getVertex(i);
+            pom2 = getVertex(i + 1);
             triangles[i] = new Triangle(polygonCenter, pom1, pom2);
         }
         return triangles;
