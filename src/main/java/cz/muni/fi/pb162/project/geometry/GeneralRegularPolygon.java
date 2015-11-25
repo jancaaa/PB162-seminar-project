@@ -8,13 +8,15 @@ public class GeneralRegularPolygon implements RegularPolygon, Colored {
     private Vertex2D center;
     private int numEdges;
     private double edgeLength;
-    private String color;
+    //  private String color;
+    private Color color;
 
     public GeneralRegularPolygon(Vertex2D center, int numEdges, double edgeLength) {
         this.center = center;
         this.numEdges = numEdges;
         this.edgeLength = edgeLength;
-        setColor("black");
+        //  setColor("black");
+        this.color = Color.BLACK;
     }
 
     @Override
@@ -62,6 +64,7 @@ public class GeneralRegularPolygon implements RegularPolygon, Colored {
         return numEdges * edgeLength;
     }
 
+    /*
     @Override
     public String getColor() {
         return color;
@@ -69,6 +72,16 @@ public class GeneralRegularPolygon implements RegularPolygon, Colored {
 
     @Override
     public void setColor(String color) {
+        this.color = color;
+    }
+    */
+
+    @Override
+    public Color getColor() {
+        return color;
+    }
+
+    public void setColor(Color color) {
         this.color = color;
     }
 

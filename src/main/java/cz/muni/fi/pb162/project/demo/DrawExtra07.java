@@ -30,8 +30,8 @@ public class DrawExtra07 extends Draw {
         Collection<Vertex2D> col = pol.removeLeftmostVertices();
         
         Draw canvas = new DrawExtra07();
-        
-        // ODKOMENTOVAT !!!!   canvas.paintSimplePolygon(pol);
+
+        canvas.paintSimplePolygon(pol);
         
     }
 }

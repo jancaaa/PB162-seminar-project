@@ -5,6 +5,8 @@ package cz.muni.fi.pb162.project.geometry;
  * @version: 7.10.2015
  */
 
+import java.util.Objects;
+
 /**
  * Represents vertex [X,Y]
  */
@@ -42,5 +44,26 @@ public class Vertex2D {
     @Override
     public String toString() {
         return "[" + x + ", " + y + "]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true; //same adress
+
+        if (o == null || getClass() != o.getClass()) return false; //different types
+        Vertex2D vertex2D = (Vertex2D) o;
+        return Objects.equals(x, vertex2D.x) &&
+                Objects.equals(y, vertex2D.y);
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        temp = Double.doubleToLongBits(x);
+        result = (int) (temp ^ (temp >>> 32));
+        temp = Double.doubleToLongBits(y);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        return result;
     }
 }

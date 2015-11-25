@@ -21,19 +21,19 @@ public class OlympicRings {
         double space = radius / 6; //space between 2 rings
 
         this.blackRing = new Circle(blackCenter, radius);
-        blackRing.setColor("black");
+        blackRing.setColor(Color.BLACK);
 
         this.redRing = generateCircle(blackCenter.getX() + 2 * radius + space, firstLineY, radius);
-        redRing.setColor("red");
+        redRing.setColor(Color.RED);
 
         this.blueRing = generateCircle(blackCenter.getX() - 2 * radius - space, firstLineY, radius);
-        blueRing.setColor("blue");
+        blueRing.setColor(Color.BLUE);
 
         this.greenRing = generateCircle(blackCenter.getX() + radius + space / 2, secondLineY, radius);
-        greenRing.setColor("green");
+        greenRing.setColor(Color.GREEN);
 
         this.yellowRing = generateCircle(blackCenter.getX() - radius - space / 2, secondLineY, radius);
-        yellowRing.setColor("yellow");
+        yellowRing.setColor(Color.YELLOW);
     }
 
     private Circle generateCircle(double x, double y, double radius) {

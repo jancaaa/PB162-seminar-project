@@ -165,7 +165,7 @@ public class Draw extends JFrame {
      * Metoda vraci logickou hodnotu v zavislosti na tom zda-li neni polygon mimo vykreslovaci prostor.
      * 
      * @param polygon Polygon ktery chci vykreslit
-     * @param fill Jestli ma byt polygon vyplneny ci nikoliv
+     * param fill Jestli ma byt polygon vyplneny ci nikoliv
      * @return true pokud se polygon vykresli, false nikoliv
      */
     public boolean paintRegularPolygon(RegularPolygon polygon) {
@@ -370,9 +370,9 @@ public class Draw extends JFrame {
             new Vertex2D(  10, -20),
             new Vertex2D(  60, -40)
         };
-        // ODKOMENTOVAT!!!!  SimplePolygon pol = new CollectionPolygon(vert1);
+        SimplePolygon pol = new CollectionPolygon(vert1);
         Draw canvas = new Draw();
-        // ODKOMENTOVAT!!!! canvas.paintSimplePolygon(pol);
+        canvas.paintSimplePolygon(pol);
         canvas.startPainting();
     }
 }
