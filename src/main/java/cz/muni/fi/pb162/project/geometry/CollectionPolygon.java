@@ -35,7 +35,7 @@ public class CollectionPolygon extends SimplePolygon {
     @Override
     public Vertex2D getVertex(int index) throws IllegalArgumentException {
         if (index < 0)
-            throw new IllegalArgumentException("Index<=0!");
+            throw new IllegalArgumentException("Index<0!");
         else
             return vertices.get(index % getNumVertices());
     }
