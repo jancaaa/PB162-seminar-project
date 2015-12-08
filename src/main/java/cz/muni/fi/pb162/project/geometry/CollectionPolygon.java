@@ -60,8 +60,9 @@ public class CollectionPolygon extends SimplePolygon {
      * @return inverted polygon
      */
     public CollectionPolygon invert() {
-        Collections.reverse(vertices);
-        return this;
+        List<Vertex2D> inverseVertices = new ArrayList<>(getVertices());
+        Collections.reverse(inverseVertices);
+        return new CollectionPolygon(inverseVertices.toArray(new Vertex2D[vertices.size()]));
     }
 
     /**
