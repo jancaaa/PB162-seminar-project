@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Represents vertex [X,Y]
  */
-public class Vertex2D {
+public class Vertex2D implements Comparable<Vertex2D> {
     private double x;
     private double y;
 
@@ -65,5 +65,13 @@ public class Vertex2D {
         temp = Double.doubleToLongBits(y);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public int compareTo(Vertex2D o) {
+        if (this.getX() - o.getX() == 0.0)
+            return (int) Math.signum(this.getY() - o.getY());
+        else
+            return (int) Math.signum(this.getX() - o.getX());
     }
 }
