@@ -1,12 +1,13 @@
 package cz.muni.fi.pb162.project.geometry;
 
+import java.io.*;
 import java.util.*;
 
 /**
  * @author: Jana Zahradnickova,  UCO 433598
  * @version: 9. 12. 2015
  */
-public class LabeledPolygon extends SimplePolygon {
+public class LabeledPolygon extends SimplePolygon implements PolygonIO {
     private SortedMap<String, Vertex2D> vertices = new TreeMap<>();
 
     /**
@@ -135,6 +136,97 @@ public class LabeledPolygon extends SimplePolygon {
             }
         }
         return Collections.unmodifiableSet(duplicities);
+    }
 
+    /**
+     * Write polygon data into output stream.
+     *
+     * @param os output stream
+     * @throws IOException on write error
+     */
+    @Override
+    public void write(OutputStream os) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+        String tmp;
+
+        for (Map.Entry<String, Vertex2D> v : vertices.entrySet()) {
+            tmp = v.getValue().getX() + " " + v.getValue().getY() + " " + v.getKey();
+            writer.write(tmp);
+            writer.newLine();
+        }
+        writer.flush();
+    }
+
+    /**
+     * Write polygon data into file.
+     *
+     * @param file ouput file
+     * @throws IOException on write error
+     */
+    @Override
+    public void write(File file) throws IOException {
+        try (OutputStream os = new FileOutputStream(file)) {
+            write(os);
+        }
+    }
+
+    /**
+     * Read polygon data from input stream.
+     *
+     * @param is input stream
+     * @throws IOException on read error
+     */
+    @Override
+    public void read(InputStream is) throws IOException {
+        Map<String, Vertex2D> tmp = new HashMap<>();
+        String line;
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            while ((line = reader.readLine()) != null) {
+                String input[] = line.split(" ", 3);
+
+                if (input.length != 3) {
+                    throw new IOException("Something is missing!");
+                }
+
+                try {
+                    tmp.put(input[2], new Vertex2D(Double.parseDouble(input[0]), Double.parseDouble(input[1])));
+                } catch (NumberFormatException a) {
+                    throw new IOException("Wrong coord/s of vertex!");
+                }
+            }
+        }
+        vertices.putAll(tmp);
+    }
+
+    /**
+     * Read polygon data from file.
+     *
+     * @param file input file
+     * @throws IOException on read error
+     */
+    @Override
+    public void read(File file) throws IOException {
+        try (InputStream is = new FileInputStream(file)) {
+            read(is);
+        }
+    }
+
+    public void binaryWrite(OutputStream os) throws IOException {
+        try {
+            write(os);
+
+            String nl = System.getProperty("line.separator");
+            for (String key : vertices.keySet()) {
+                Vertex2D v = this.getVertex(key);
+                String line = v.getX() + " " + v.getY() + " " + key;
+                os.write(line.getBytes());
+                os.write(nl.getBytes());
+            }
+        } catch (IOException e) {
+            throw new IOException();
+        } finally {
+            os.flush();
+        }
     }
 }

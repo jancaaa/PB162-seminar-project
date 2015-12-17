@@ -2,6 +2,10 @@ package cz.muni.fi.pb162.project.demo;
 
 import java.awt.Graphics;
 import java.awt.Polygon;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFrame;
@@ -11,7 +15,6 @@ import cz.muni.fi.pb162.project.geometry.Circle;
 import cz.muni.fi.pb162.project.geometry.SimplePolygon;
 import cz.muni.fi.pb162.project.geometry.Triangle;
 import cz.muni.fi.pb162.project.geometry.RegularPolygon;
-import cz.muni.fi.pb162.project.geometry.CollectionPolygon;
 import cz.muni.fi.pb162.project.geometry.Color;
 import cz.muni.fi.pb162.project.geometry.Colored;
 import cz.muni.fi.pb162.project.geometry.Vertex2D;
@@ -27,6 +30,8 @@ import cz.muni.fi.pb162.project.geometry.LabeledPolygon;
 
 public class Draw extends JFrame {
 
+    private static final String TEST_FILE = "/polygon.txt";
+    
     /**
      * Znaci polovinu delky usecky pro vykresleni bodu.
      */
@@ -165,7 +170,6 @@ public class Draw extends JFrame {
      * Metoda vraci logickou hodnotu v zavislosti na tom zda-li neni polygon mimo vykreslovaci prostor.
      * 
      * @param polygon Polygon ktery chci vykreslit
-     * @param fill Jestli ma byt polygon vyplneny ci nikoliv
      * @return true pokud se polygon vykresli, false nikoliv
      */
     public boolean paintRegularPolygon(RegularPolygon polygon) {
@@ -423,16 +427,15 @@ public class Draw extends JFrame {
             paintLabeledPolygon(g, pol);
         }
     }
-    
-    public static void main(String[] args) {
+
+    private static File getResourceAsFile(String path) throws URISyntaxException {
+        URL url = Draw.class.getResource(path);
+        return new File(url.toURI());
+    }
+
+    public static void main(String[] args) throws IOException, URISyntaxException {
         LabeledPolygon pol = new LabeledPolygon();
-        pol.addVertex("A", new Vertex2D(-100, -100));
-        pol.addVertex("C", new Vertex2D(100, -100));
-        pol.addVertex("D", new Vertex2D(100, 100));
-        pol.addVertex("F", new Vertex2D(-100, 100));
-        pol.addVertex("B", new Vertex2D(0, -20));
-        pol.addVertex("E", new Vertex2D(0, 20));
-        
+        pol.read(getResourceAsFile(TEST_FILE));
         Draw canvas = new Draw();
         canvas.paintLabeledPolygon(pol);
         canvas.startPainting();

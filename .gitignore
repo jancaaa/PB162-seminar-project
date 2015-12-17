@@ -1,4 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
+### project files
+pol-out.txt
+polygon.bin
+
 ### Java template
 *.class
 
