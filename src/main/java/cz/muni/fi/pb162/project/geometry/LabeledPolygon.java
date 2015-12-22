@@ -180,8 +180,8 @@ public class LabeledPolygon extends SimplePolygon implements PolygonIO {
     public void read(InputStream is) throws IOException {
         Map<String, Vertex2D> tmp = new HashMap<>();
         String line;
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+        InputStreamReader isr = new InputStreamReader(is);
+        try (BufferedReader reader = new BufferedReader(isr)) {
             while ((line = reader.readLine()) != null) {
                 String input[] = line.split(" ", 3);
 
@@ -216,7 +216,7 @@ public class LabeledPolygon extends SimplePolygon implements PolygonIO {
         try {
             write(os);
 
-            String nl = System.getProperty("line.separator");
+            String nl = System.lineSeparator();
             for (String key : vertices.keySet()) {
                 Vertex2D v = this.getVertex(key);
                 String line = v.getX() + " " + v.getY() + " " + key;
